@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>扫雷 - Minesweeper</title>
+  <script type="module" crossorigin src="/minesweeper/assets/index-1-n4ODgz.js"></script>
+  <link rel="stylesheet" crossorigin href="/minesweeper/assets/index-BLWMEPC2.css">
+</head>
+<body>
+  <div class="container">
+    <h1>💣 扫雷</h1>
+    
+    <div class="game-info">
+      <div class="info-box">
+        <span class="label">💣 剩余雷数</span>
+        <span id="mine-count" class="value">10</span>
+      </div>
+      <div class="info-box">
+        <span class="label">⏱️ 时间</span>
+        <span id="timer" class="value">0</span>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button id="new-game">新游戏</button>
+      <select id="difficulty">
+        <option value="easy">简单 (9×9, 10 雷)</option>
+        <option value="medium" selected>中等 (16×16, 40 雷)</option>
+        <option value="hard">困难 (16×30, 99 雷)</option>
+      </select>
+    </div>
+
+    <div id="game-board" class="game-board"></div>
+    
+    <div id="game-message" class="game-message"></div>
+  </div>
+
+</body>
+</html>
