@@ -139,6 +139,47 @@ class Game {
     return true
   }
 
+  // 扫描：点击已翻开的数字，如果周围旗子数等于数字，翻开周围未插旗的格子
+  sweep(row: number, col: number): boolean {
+    const cell = this.board[row][col]
+    if (!cell.isRevealed || cell.neighborMines === 0) {
+      return false
+    }
+
+    // 数周围有多少旗子
+    let flagCount = 0
+    const neighbors: [number, number][] = []
+    
+    for (let di = -1; di <= 1; di++) {
+      for (let dj = -1; dj <= 1; dj++) {
+        if (di === 0 && dj === 0) continue
+        const ni = row + di
+        const nj = col + dj
+        if (ni >= 0 && ni < this.rows && nj >= 0 && nj < this.cols) {
+          const neighbor = this.board[ni][nj]
+          if (neighbor.isFlagged) {
+            flagCount++
+          } else if (!neighbor.isRevealed) {
+            neighbors.push([ni, nj])
+          }
+        }
+      }
+    }
+
+    // 如果旗子数等于数字，翻开周围所有未插旗的格子
+    if (flagCount === cell.neighborMines) {
+      let hitMine = false
+      for (const [ni, nj] of neighbors) {
+        if (this.reveal(ni, nj) === false && this.board[ni][nj].isMine) {
+          hitMine = true
+        }
+      }
+      return !hitMine
+    }
+
+    return false
+  }
+
   // 插旗/取消插旗
   toggleFlag(row: number, col: number): void {
     if (this.gameOver || this.board[row][col].isRevealed) return
@@ -284,6 +325,8 @@ class Renderer {
           } else if (cell.neighborMines > 0) {
             cellEl.textContent = cell.neighborMines.toString()
             cellEl.classList.add(`num-${cell.neighborMines}`)
+            // 数字格子可以触发扫描
+            cellEl.classList.add('sweepable')
           }
         } else if (cell.isFlagged) {
           cellEl.classList.add('flagged')
@@ -302,7 +345,15 @@ class Renderer {
   }
 
   private handleClick(row: number, col: number): void {
-    this.game.reveal(row, col)
+    const cell = this.game.getCell(row, col)
+    
+    // 如果已经翻开且有数字，触发扫描
+    if (cell.isRevealed && cell.neighborMines > 0) {
+      this.game.sweep(row, col)
+    } else {
+      this.game.reveal(row, col)
+    }
+    
     this.render()
     this.checkGameEnd()
   }
